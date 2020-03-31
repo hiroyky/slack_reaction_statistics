@@ -1,0 +1,8 @@
+{
+  "name": "slack_reaction_statistics",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:hiroyky/slack_reaction_statistics.git",
+  "author": "Yokoyama Hirokazu <hiroyky.voyager@gmail.com>",
+  "license": "MIT"
+}
