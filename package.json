@@ -4,5 +4,27 @@
   "main": "index.js",
   "repository": "git@github.com:hiroyky/slack_reaction_statistics.git",
   "author": "Yokoyama Hirokazu <hiroyky.voyager@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "scripts": {
+    "build": "webpack",
+    "lint": "eslint ./src/**/*",
+    "clean": "rm -rf ./dest"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.3",
+    "@typescript-eslint/eslint-plugin": "^2.26.0",
+    "@typescript-eslint/parser": "^2.26.0",
+    "aws-sdk": "^2.649.0",
+    "eslint": "^6.8.0",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "express": "^4.17.1",
+    "ts-loader": "^6.2.2",
+    "typescript": "^3.8.3",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11"
+  }
 }
