@@ -3,42 +3,68 @@ import {
     ChatPostMessageArguments, 
     ConversationsListArguments, 
     ConversationsHistoryArguments, 
-    ConversationsJoinArguments 
-} from '@slack/client'
+    ConversationsJoinArguments,
+    ChatGetPermalinkArguments, 
+} from "@slack/client"
 
 export default class SlackDriver {
 
-    constructor(private client: WebClient) {}
+    constructor(
+        private client: WebClient, 
+        private token: string,
+    ) {}
 
-    public getConversationList(arg: ConversationsListArguments) {
+    public async getConversationList(arg: ConversationsListArguments) {
         try {
-            return this.client.conversations.list(arg)
+            arg.token = this.token
+            const result = await this.client.conversations.list(arg)
+            if (!result.ok) {
+                throw result.error
+            }
+            return result
         } catch(err) {
             console.error(err)
+            throw err
         }
     }
 
-    public getConversationHistory(arg: ConversationsHistoryArguments) {
+    public async getConversationHistory(arg: ConversationsHistoryArguments) {
         try {
-            return  this.client.conversations.history(arg)
+            arg.token = this.token
+            return  await this.client.conversations.history(arg)
         } catch(err) {
             console.error(err)
+            throw err
         }
     }
 
-    public joinConversation(arg: ConversationsJoinArguments) {
+    public async joinConversation(arg: ConversationsJoinArguments) {
         try {
-            return this.client.conversations.join(arg)
+            arg.token = this.token
+            return await this.client.conversations.join(arg)
         } catch(err) {
             console.error(err)
+            throw err
+        }
+    }
+
+    public async getPermalink(arg: ChatGetPermalinkArguments) {
+        try {
+            arg.token = this.token
+            return await this.client.chat.getPermalink(arg)
+        } catch(err) {
+            console.error(err)
+            throw err
         }
     }
 
     public async postMessage(arg: ChatPostMessageArguments) {
         try {
-            return this.client.chat.postMessage(arg)
+            arg.token = this.token
+            return await this.client.chat.postMessage(arg)
         } catch(err) {
             console.error(err)
+            throw err
         }
     }
 
