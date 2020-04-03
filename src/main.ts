@@ -15,10 +15,10 @@ async function main() {
             );
 
         const now = new Date()
-        const from = service.calcFromDate(process.env.FROM_DAYS!, now)
-        const to = service.calcToDate(process.env.TO_DAYS!, now)
+        const from = service.calcFromDate(service.parseInt(process.env.FROM_DAYS), now)
+        const to = service.calcToDate(service.parseInt(process.env.FROM_DAYS), now)
 
-        await service.process(process.env.POST_CHANNEL!, from, to)
+        await service.process(process.env.POST_CHANNEL!, from, to, service.parseInt(process.env.NUM_FEATURES))
     } catch(err) {
         console.error(err)
         throw err
