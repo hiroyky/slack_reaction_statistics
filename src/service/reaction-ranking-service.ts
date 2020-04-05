@@ -40,6 +40,10 @@ export default class ReactionRankingService {
         return dt
     }
 
+    public async parseExcludeChannel() {
+        
+    }
+
     public async process(postChannel: string, from: Date, to: Date, numFeatures: number) {
         const channels = await this.slackService.getPublicAllChannels()
         await this.slackService.joinChannels(channels)
