@@ -1,23 +1,12 @@
 import SlackService from "./slack-service";
 import SlackCalcService from "./slack-calc-service"
+import EnvService from "./env-service";
 
 export default class ReactionRankingService {
     constructor(
         private slackService: SlackService, 
         private slackCalcService: SlackCalcService,
         ) {
-    }
-
-    public parseInt(str: string | undefined): number {
-        if (str === undefined) {
-            throw new Error('str is undefined')
-        }
-        const val = Number.parseInt(str, 10)
-        if(isNaN(val)) {
-            throw new Error(`${str} is valid number string.`)
-        }
-
-        return val
     }
 
     public calcFromDate(n: number, base: Date): Date {
@@ -40,14 +29,19 @@ export default class ReactionRankingService {
         return dt
     }
 
-    public async process(postChannel: string, from: Date, to: Date, numFeatures: number) {
+    public async process(env: EnvService) {
         const channels = await this.slackService.getPublicAllChannels()
-        await this.slackService.joinChannels(channels)
+        const targetChannels = this.slackCalcService.filterTargetChannels(channels, env.includeChannels, env.excludeChannels)
+        await this.slackService.joinChannels(targetChannels)
 
-        const items = await this.slackService.getConversations(channels, from, to)
+        const now = new Date()
+        const from = this.calcFromDate(env.fromDays, now)
+        const to = this.calcFromDate(env.toDays, now)
+
+        const items = await this.slackService.getConversations(targetChannels, from, to)
         const reactedItems = this.slackCalcService.filterHavingReactions(items)
         const result = this.slackCalcService.sortByReaction(reactedItems)
-        const links = await this.slackService.getPermLinks(result.slice(0, numFeatures))
-        await this.slackService.postFeaturedPosts(postChannel, links, from, to)
+        const links = await this.slackService.getPermLinks(result.slice(0, env.numFeatures))
+        await this.slackService.postFeaturedPosts(env.postChannel, links, from, to)
     }    
 }

@@ -10,7 +10,7 @@ export default class SlackService {
             exclude_archived: true,
             limit: 1000,        
             cursor,
-        })
+        });
 
         channels.push(...(result.channels as ConversationsListResultItem[]))
 
