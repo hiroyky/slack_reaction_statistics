@@ -14,11 +14,7 @@ async function main() {
             new SlackCalcService(),            
             );
 
-        const now = new Date()
-        const from = service.calcFromDate(env.fromDays, now)
-        const to = service.calcToDate(env.toDays, now)
-
-        await service.process(process.env.POST_CHANNEL!, from, to, env.numFeatures)
+        await service.process(env)
     } catch(err) {
         console.error(err)
         throw err

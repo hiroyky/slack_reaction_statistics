@@ -13,6 +13,14 @@ export default class EnvService {
         return token
     }
 
+    public get postChannel(): string {
+        const channel = process.env.POST_CHANNEL
+        if (channel === undefined) {
+            throw new Error(`env: POST_CHANNEL is undefined`)
+        }
+        return channel
+    }
+
     public get fromDays(): number {
         return this.parseInt(process.env.FROM_DAYS)
     }
@@ -23,7 +31,23 @@ export default class EnvService {
 
     public get numFeatures(): number {
         return this.parseInt(process.env.NUM_FEATURES)
-    }    
+    }
+
+    public get includeChannels(): string[] {
+        const includes = process.env.INCLUDE_CHANNELS
+        if (includes === undefined) {
+            return []
+        }
+        return includes.split(',')
+    }
+
+    public get excludeChannels(): string[] {
+        const exclude = process.env.EXCLUDE_CHANNELS
+        if (exclude === undefined) {
+            return []
+        }
+        return exclude.split(',')
+    }
 
     private parseInt(str: string | undefined) {
         if (str === undefined) {

@@ -1,6 +1,22 @@
-import { ConversationItem } from "../types";
+import { ConversationItem, ConversationsListResultItem } from "../types";
 
 export default class SlackCalcService {
+    public filterTargetChannels(allChannels: ConversationsListResultItem[], includes: string[], exclucdes: string[]): ConversationsListResultItem[] {
+        return allChannels
+                .filter(c => {
+                    if (includes.length === 0) {
+                        return true
+                    }
+                    return includes.find(ic => c.id == ic) !== undefined
+                })
+                .filter((c) => {
+                    if (exclucdes.length === 0) {
+                        return true
+                    }
+                    return exclucdes.find(ec => c.id == ec) === undefined
+                })
+    }
+
     public filterHavingReactions(items: ConversationItem[]) {
         return items
                 .filter(i => !i.channel.is_private && i.channel.is_channel)
