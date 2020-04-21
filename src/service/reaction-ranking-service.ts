@@ -52,7 +52,7 @@ export default class ReactionRankingService {
         const result = this.slackCalcService.sortByReaction(reactedItems)
         const links = await this.slackService.getPermLinks(this.slackCalcService.extractTopItems(result, env.numFeatures))
         console.log(links)
-        //await this.slackService.postFeaturedPosts(env.postChannel, links, from, to)
+        await this.slackService.postFeaturedPosts(env.postChannel, links, from, to)
     }    
 
     private getTimeStamp(){
