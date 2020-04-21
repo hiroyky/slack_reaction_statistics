@@ -86,8 +86,6 @@ export default class SlackService {
 ${ moment(from).format('MM日月DD日')}から${ moment(to).format('MM月DD日')}の間で、注目を集めたメッセージをお知らせします。
 
 注目を集めたメッセージは......!!
-
-${permLinks.join('\n')}
 `
 
         await this.slackDriver.postMessage({
@@ -95,6 +93,15 @@ ${permLinks.join('\n')}
             text,            
             username: '注目メッセージを探してくるマン',
         })
+
+        for (const link of permLinks) {
+            await this.wait()
+            await this.slackDriver.postMessage({
+                channel: targetChannel,
+                text: link,
+                username: '注目メッセージを探してくるマン',
+            })
+        }
     }
 
     private wait() {
