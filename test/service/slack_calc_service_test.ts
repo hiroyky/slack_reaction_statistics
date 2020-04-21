@@ -1,5 +1,6 @@
 import { assert } from 'chai'
 import SlackCalcService from '../../src/service/slack-calc-service'
+import { ConversationItem } from '../../src/types'
 
 describe("SlackCalcService", () => {
     describe("filterTargetChannels", () => {
@@ -94,6 +95,106 @@ describe("SlackCalcService", () => {
                 { id: 'id3' },
                 { id: 'id4' },
                 { id: 'id5' },
+            ]
+
+            assert.deepEqual(actual, expected)
+        })
+    })
+
+    describe('extractTopItems', () => {
+        it('よくあるパターン', () => {
+            const items: any[] = [
+                {
+                    history: {
+                        reactions: [
+                            {count: 10},
+                            {count: 5},
+                            {count: 5},
+                        ],
+                    }
+                },
+                {
+                    history: {
+                        reactions: [
+                            {count: 10},
+                        ],
+                    }
+                },
+                {
+                    history: {
+                        reactions: [
+                            {count: 9},
+                            {count: 5},
+                        ],
+                    }
+                },
+                {
+                    history: {
+                        reactions: [
+                            {count: 14},
+                        ],
+                    }
+                },
+                {
+                    history: {
+                        reactions: [
+                            {count: 7},
+                            {count: 7},
+                        ],
+                    }
+                },
+                {
+                    history: {
+                        reactions: [
+                            {count: 7},
+                            {count: 6},
+                        ],
+                    }
+                },
+            ]
+
+            const service = new SlackCalcService()
+            const actual = service.extractTopItems(items, 3)
+            const expected: any[] = [
+                {
+                    history: {
+                        reactions: [
+                            {count: 10},
+                            {count: 5},
+                            {count: 5},
+                        ],
+                    }
+                },
+                {
+                    history: {
+                        reactions: [
+                            {count: 10},
+                        ],
+                    }
+                },
+                {
+                    history: {
+                        reactions: [
+                            {count: 9},
+                            {count: 5},
+                        ],
+                    }
+                },
+                {
+                    history: {
+                        reactions: [
+                            {count: 14},
+                        ],
+                    }
+                },
+                {
+                    history: {
+                        reactions: [
+                            {count: 7},
+                            {count: 7},
+                        ],
+                    }
+                },
             ]
 
             assert.deepEqual(actual, expected)

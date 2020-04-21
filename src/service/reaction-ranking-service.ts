@@ -49,7 +49,7 @@ export default class ReactionRankingService {
         const items = await this.slackService.getConversations(targetChannels, from, to)
         const reactedItems = this.slackCalcService.filterHavingReactions(items)
         const result = this.slackCalcService.sortByReaction(reactedItems)
-        const links = await this.slackService.getPermLinks(result.slice(0, env.numFeatures))
+        const links = await this.slackService.getPermLinks(this.slackCalcService.extractTopItems(result, env.numFeatures))
         await this.slackService.postFeaturedPosts(env.postChannel, links, from, to)
     }    
 

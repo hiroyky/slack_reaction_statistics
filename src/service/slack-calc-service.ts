@@ -29,8 +29,8 @@ export default class SlackCalcService {
         return items
             .filter(i => i.history.reactions)
             .sort((a, b) => {
-                const aLength = a.history.reactions!.map(r => r.count).reduce((a, b) => a + b)
-                const bLength = b.history.reactions!.map(r => r.count).reduce((a, b) => a + b)
+                const aLength = this.calcReactionsCount(a)
+                const bLength = this.calcReactionsCount(b)
                 if(aLength > bLength) {
                     return 1
                 }
@@ -39,5 +39,35 @@ export default class SlackCalcService {
                 }
                 return 0
         })
+    }
+
+    public extractTopItems(items: ConversationItem[], num: number): ConversationItem[] {
+        const topItems = items.slice(0, num)
+        if (topItems.length == 0 ) {
+            return []
+        }
+        if (topItems.length == items.length) {
+            return topItems
+        }
+
+        const tail = topItems[topItems.length - 1]
+        const tailCount = this.calcReactionsCount(tail)
+
+        for (let i = topItems.length; i < items.length; ++i) {
+            if (this.calcReactionsCount(items[i]) === tailCount) {
+                topItems.push(items[i])
+            } else {
+                break;
+            }
+        }
+
+        return topItems
+    }
+
+    private calcReactionsCount(item: ConversationItem): number {
+        if (item.history.reactions === undefined) {
+            return 0
+        }
+        return item.history.reactions.map(r => r.count).reduce((a, b) => a + b)
     }
 }
