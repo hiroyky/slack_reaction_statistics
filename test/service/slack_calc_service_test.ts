@@ -101,6 +101,67 @@ describe("SlackCalcService", () => {
         })
     })
 
+    describe('sortByReaction', () => {
+        it('ソート', () => {
+            const items: any[] = [
+                {
+                    history: {
+                        reactions: [
+                            {count: 10},
+                            {count: 5},
+                            {count: 5},
+                        ],
+                    }
+                },
+                {
+                    history: {
+                        reactions: [
+                            {count: 1},
+                        ],
+                    }
+                },
+                {
+                    history: {
+                        reactions: [
+                            {count: 2},
+                            {count: 5},
+                        ],
+                    }
+                },
+            ]
+
+            const service = new SlackCalcService()
+            const actual = service.sortByReaction(items)
+            const expected: any[] = [
+                {
+                    history: {
+                        reactions: [
+                            {count: 10},
+                            {count: 5},
+                            {count: 5},
+                        ],
+                    }
+                },
+                {
+                    history: {
+                        reactions: [
+                            {count: 2},
+                            {count: 5},
+                        ],
+                    }
+                },
+                {
+                    history: {
+                        reactions: [
+                            {count: 1},
+                        ],
+                    }
+                },
+            ]
+            assert.deepEqual(actual, expected)
+        })
+    })
+
     describe('extractTopItems', () => {
         it('よくあるパターン', () => {
             const items: any[] = [
