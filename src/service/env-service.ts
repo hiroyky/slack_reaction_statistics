@@ -38,7 +38,7 @@ export default class EnvService {
         if (includes === undefined) {
             return []
         }
-        return includes.split(',')
+        return includes.split(',').filter(i => i.length > 0)
     }
 
     public get excludeChannels(): string[] {
@@ -46,7 +46,7 @@ export default class EnvService {
         if (exclude === undefined) {
             return []
         }
-        return exclude.split(',')
+        return exclude.split(',').filter(i => i.length > 0)
     }
 
     private parseInt(str: string | undefined) {
