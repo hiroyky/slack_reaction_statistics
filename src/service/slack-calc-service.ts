@@ -31,10 +31,10 @@ export default class SlackCalcService {
             .sort((a, b) => {
                 const aLength = this.calcReactionsCount(a)
                 const bLength = this.calcReactionsCount(b)
-                if(aLength > bLength) {
+                if(aLength < bLength) {
                     return 1
                 }
-                if (bLength>aLength) {
+                if (aLength > bLength) {
                     return -1
                 }
                 return 0
