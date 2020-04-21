@@ -30,18 +30,30 @@ export default class ReactionRankingService {
     }
 
     public async process(env: EnvService) {
+        console.log(this.getTimeStamp(), "Begin process")
+
+        console.log(this.getTimeStamp(), "gathergin channel list...")
         const channels = await this.slackService.getPublicAllChannels()
         const targetChannels = this.slackCalcService.filterTargetChannels(channels, env.includeChannels, env.excludeChannels)
-        await this.slackService.joinChannels(targetChannels)
+        console.log(this.getTimeStamp(), `found: ${channels.length} channels, target: ${targetChannels.length} channels`)
+
+        console.log(this.getTimeStamp(), "joining channels which bot do't still join....")
+        const newCount = await this.slackService.joinChannels(targetChannels)
+        console.log(this.getTimeStamp(), `joined ${newCount} channels.`)
 
         const now = new Date()
         const from = this.calcFromDate(env.fromDays, now)
         const to = this.calcFromDate(env.toDays, now)
 
+        console.log(this.getTimeStamp(), "gathering conversation items...")
         const items = await this.slackService.getConversations(targetChannels, from, to)
         const reactedItems = this.slackCalcService.filterHavingReactions(items)
         const result = this.slackCalcService.sortByReaction(reactedItems)
         const links = await this.slackService.getPermLinks(result.slice(0, env.numFeatures))
         await this.slackService.postFeaturedPosts(env.postChannel, links, from, to)
     }    
+
+    private getTimeStamp(){
+        return new Date().getTime() / 1000
+    }
 }

@@ -8,7 +8,6 @@ import {
 } from "@slack/client"
 
 export default class SlackDriver {
-
     constructor(
         private client: WebClient, 
         private token: string,
@@ -67,5 +66,4 @@ export default class SlackDriver {
             throw err
         }
     }
-
 }
