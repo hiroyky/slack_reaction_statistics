@@ -47,10 +47,12 @@ export default class ReactionRankingService {
 
         console.log(this.getTimeStamp(), "gathering conversation items...")
         const items = await this.slackService.getConversations(targetChannels, from, to)
+        console.log(this.getTimeStamp(), `gatherd ${items.length} items`)
         const reactedItems = this.slackCalcService.filterHavingReactions(items)
         const result = this.slackCalcService.sortByReaction(reactedItems)
         const links = await this.slackService.getPermLinks(this.slackCalcService.extractTopItems(result, env.numFeatures))
-        await this.slackService.postFeaturedPosts(env.postChannel, links, from, to)
+        console.log(links)
+        //await this.slackService.postFeaturedPosts(env.postChannel, links, from, to)
     }    
 
     private getTimeStamp(){
