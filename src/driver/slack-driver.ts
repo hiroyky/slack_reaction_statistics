@@ -15,8 +15,9 @@ export default class SlackDriver {
 
     public async getConversationList(arg: ConversationsListArguments) {
         try {
+            console.log(this.getTimeStamp(), "slackdriver getConversationList")
             arg.token = this.token
-            const result = await this.client.conversations.list(arg)
+            const result = await this.client.conversations.list(arg)            
             if (!result.ok) {
                 throw result.error
             }
@@ -29,6 +30,7 @@ export default class SlackDriver {
 
     public async getConversationHistory(arg: ConversationsHistoryArguments) {
         try {
+            console.log(this.getTimeStamp(), "slackdriver getConversationHistory")
             arg.token = this.token
             return  await this.client.conversations.history(arg)
         } catch(err) {
@@ -39,6 +41,7 @@ export default class SlackDriver {
 
     public async joinConversation(arg: ConversationsJoinArguments) {
         try {
+            console.log(this.getTimeStamp(), "slackdriver joinConversation")
             arg.token = this.token
             return await this.client.conversations.join(arg)
         } catch(err) {
@@ -49,6 +52,7 @@ export default class SlackDriver {
 
     public async getPermalink(arg: ChatGetPermalinkArguments) {
         try {
+            console.log(this.getTimeStamp(), "slackdriver getPermalink")
             arg.token = this.token
             return await this.client.chat.getPermalink(arg)
         } catch(err) {
@@ -59,6 +63,7 @@ export default class SlackDriver {
 
     public async postMessage(arg: ChatPostMessageArguments) {
         try {
+            console.log(this.getTimeStamp(), "slackdriver postMessage")
             arg.token = this.token
             return await this.client.chat.postMessage(arg)
         } catch(err) {
@@ -66,4 +71,9 @@ export default class SlackDriver {
             throw err
         }
     }
+
+    private getTimeStamp(){
+        return new Date().getTime() / 1000
+    }
+
 }
