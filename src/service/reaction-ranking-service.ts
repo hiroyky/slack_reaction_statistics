@@ -46,11 +46,9 @@ export default class ReactionRankingService {
         const to = this.calcFromDate(env.toDays, now)
 
         console.log(this.getTimeStamp(), "gathering conversation items...")
-        const items = await this.slackService.getConversations(targetChannels, from, to)
+        const items = await this.slackService.getTheMostReactedConversations(targetChannels, from, to, env.numFeatures)
         console.log(this.getTimeStamp(), `gatherd ${items.length} items`)
-        const reactedItems = this.slackCalcService.filterHavingReactions(items)
-        const result = this.slackCalcService.sortByReaction(reactedItems)
-        const links = await this.slackService.getPermLinks(this.slackCalcService.extractTopItems(result, env.numFeatures))
+        const links = await this.slackService.getPermLinks(this.slackCalcService.extractTopItems(items, env.numFeatures))
         console.log(links)
         await this.slackService.postFeaturedPosts(env.postChannel, links, from, to)
     }    
