@@ -1,4 +1,4 @@
-import { ConversationItem, ConversationsListResultItem } from "../types";
+import { ConversationItem, ConversationsListResultItem, ConversationsHistoryResultItem } from "../types";
 
 export default class SlackCalcService {
     public filterTargetChannels(allChannels: ConversationsListResultItem[], includes: string[], exclucdes: string[]): ConversationsListResultItem[] {
@@ -17,17 +17,39 @@ export default class SlackCalcService {
                 })
     }
 
-    public filterHavingReactions(items: ConversationItem[]) {
+    public filterAvailableHistories(items: ConversationsHistoryResultItem[]) {
         return items
-                .filter(i => !i.channel.is_private && i.channel.is_channel)
-                .filter(i => !i.history.bot_id && i.history.user)
-                .filter(i => !i.history.subtype)
-                .filter(i => i.history.reactions)
+                .filter(i => !i.bot_id && i.user)
+                .filter(i => !i.subtype)
+                .filter(i => i.reactions)
+    }
+
+
+    public extractTopItems(sortedItems: ConversationItem[], num: number): ConversationItem[] {        
+        const topItems = sortedItems.slice(0, num)
+        if (topItems.length == 0 ) {
+            return []
+        }
+        if (topItems.length == sortedItems.length) {
+            return topItems
+        }
+
+        const tail = topItems[topItems.length - 1]
+        const tailCount = this.calcReactionsCount(tail)
+
+        for (let i = topItems.length; i < sortedItems.length; ++i) {
+            if (this.calcReactionsCount(sortedItems[i]) === tailCount) {
+                topItems.push(sortedItems[i])
+            } else {
+                break;
+            }
+        }
+
+        return topItems
     }
 
     public sortByReaction(items: ConversationItem[]) {
         return items
-            .filter(i => i.history.reactions)
             .sort((a, b) => {
                 const aLength = this.calcReactionsCount(a)
                 const bLength = this.calcReactionsCount(b)
@@ -41,30 +63,7 @@ export default class SlackCalcService {
         })
     }
 
-    public extractTopItems(items: ConversationItem[], num: number): ConversationItem[] {
-        const topItems = items.slice(0, num)
-        if (topItems.length == 0 ) {
-            return []
-        }
-        if (topItems.length == items.length) {
-            return topItems
-        }
-
-        const tail = topItems[topItems.length - 1]
-        const tailCount = this.calcReactionsCount(tail)
-
-        for (let i = topItems.length; i < items.length; ++i) {
-            if (this.calcReactionsCount(items[i]) === tailCount) {
-                topItems.push(items[i])
-            } else {
-                break;
-            }
-        }
-
-        return topItems
-    }
-
-    private calcReactionsCount(item: ConversationItem): number {
+    public calcReactionsCount(item: ConversationItem): number {
         if (item.history.reactions === undefined) {
             return 0
         }

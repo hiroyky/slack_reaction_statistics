@@ -1,9 +1,10 @@
 import SlackDriver from "../driver/slack-driver";
 import { ConversationsListResultItem, ConversationsHistoryResultItem, ConversationItem } from "../types"
 import moment from 'moment-timezone'
+import SlackCalcService from "./slack-calc-service";
 
 export default class SlackService {
-    constructor(private slackDriver: SlackDriver) {}
+    constructor(private slackDriver: SlackDriver, private calcService = new SlackCalcService()) {}    
 
     public async getPublicAllChannels(channels: ConversationsListResultItem[] = [], cursor = ""): Promise<ConversationsListResultItem[]> {
         await this.wait()
@@ -33,22 +34,21 @@ export default class SlackService {
         return newChannels.length
     }
 
-    public async getConversations(channels: ConversationsListResultItem[], from: Date, to: Date): Promise<ConversationItem[]> {
+    public async getTheMostReactedConversations(channels: ConversationsListResultItem[], from: Date, to: Date, topNum: number): Promise<ConversationItem[]> {
         const list = channels.filter(c => c.is_member)
 
         const result = new Array<ConversationItem>()
 
         for (const channel of list) {
-            const histories = await this.getChannelConversationRecursive(channel, from, to)
-            const items = histories.map(history => ({ channel, history }))
-            result.push(...items)
+            const histories = await this.getChannelTheMostConversationRecursive(channel, from, to, topNum)
+            result.push(...this.calcService.extractTopItems(histories, topNum))
             await this.wait()
         }
 
         return result
     }
 
-    public async getChannelConversationRecursive(channel: ConversationsListResultItem, from: Date, to: Date, histories = new Array<ConversationsHistoryResultItem>(), cursor = ""): Promise<ConversationsHistoryResultItem[]> {
+    public async getChannelTheMostConversationRecursive(channel: ConversationsListResultItem, from: Date, to: Date, topNum: number, histories = new Array<ConversationItem>(), cursor = ""): Promise<ConversationItem[]> {
         await this.wait()
 
         const result = await this.slackDriver.getConversationHistory({
@@ -58,10 +58,14 @@ export default class SlackService {
             latest: String(to.getTime() / 1000),
             cursor,
         })
-        histories.push(...(result.messages as ConversationsHistoryResultItem[]))
+        const messgaes = this.calcService.filterAvailableHistories(result.messages as ConversationsHistoryResultItem[]).map(history => ({history,channel}))
+        const reactedMessages = messgaes.filter(m => this.calcService.calcReactionsCount(m) > 0)
+        const topMessages = this.calcService.extractTopItems(this.calcService.sortByReaction(reactedMessages), topNum)
+
+        histories.push(...(topMessages))
 
         if (result.response_metadata && result.response_metadata.next_cursor) {
-            return await this.getChannelConversationRecursive(channel, from, to, histories, result.response_metadata.next_cursor)
+            return await this.getChannelTheMostConversationRecursive(channel, from, to, topNum, histories, result.response_metadata.next_cursor)
         }
 
         return histories
