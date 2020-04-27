@@ -30,7 +30,7 @@ export default class SlackDriver {
 
     public async getConversationHistory(arg: ConversationsHistoryArguments) {
         try {
-            console.log(this.getTimeStamp(), "slackdriver getConversationHistory")
+            console.log(this.getTimeStamp(), "slackdriver getConversationHistory", arg.channel)
             arg.token = this.token
             return  await this.client.conversations.history(arg)
         } catch(err) {
@@ -41,7 +41,7 @@ export default class SlackDriver {
 
     public async joinConversation(arg: ConversationsJoinArguments) {
         try {
-            console.log(this.getTimeStamp(), "slackdriver joinConversation")
+            console.log(this.getTimeStamp(), "slackdriver joinConversation", arg.channel)
             arg.token = this.token
             return await this.client.conversations.join(arg)
         } catch(err) {
