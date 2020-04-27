@@ -1,6 +1,7 @@
 import SlackService from "./slack-service";
 import SlackCalcService from "./slack-calc-service"
 import EnvService from "./env-service";
+import moment from 'moment-timezone'
 
 export default class ReactionRankingService {
     constructor(
@@ -30,6 +31,11 @@ export default class ReactionRankingService {
     }
 
     public async process(env: EnvService) {
+        const now = new Date()
+        const from = this.calcFromDate(env.fromDays, now)
+        const to = this.calcFromDate(env.toDays, now)
+        console.log(`${ moment(from).format('MM日月DD日')}から${ moment(to).format('MM月DD日')}`)
+
         console.log(this.getTimeStamp(), "Begin process")
 
         console.log(this.getTimeStamp(), "gathergin channel list...")
@@ -40,10 +46,6 @@ export default class ReactionRankingService {
         console.log(this.getTimeStamp(), "joining channels which bot do't still join....")
         const newCount = await this.slackService.joinChannels(targetChannels)
         console.log(this.getTimeStamp(), `joined ${newCount} channels.`)
-
-        const now = new Date()
-        const from = this.calcFromDate(env.fromDays, now)
-        const to = this.calcFromDate(env.toDays, now)
 
         console.log(this.getTimeStamp(), "gathering conversation items...")
         const items = await this.slackService.getTheMostReactedConversations(targetChannels, from, to, env.numFeatures)
