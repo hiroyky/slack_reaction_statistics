@@ -40,17 +40,17 @@ export default class SlackService {
         const result = new Array<ConversationItem>()
 
         for (const channel of list) {
-            const histories = await this.getChannelTheMostConversationRecursive(channel, from, to, topNum)
-            result.push(...this.calcService.extractTopItems(histories, topNum))
+            console.log('channel', channel.id, channel.name)
+            await this.getChannelTheMostConversationRecursive(channel, from, to, topNum, result)
             await this.wait()
         }
 
         return result
     }
 
-    public async getChannelTheMostConversationRecursive(channel: ConversationsListResultItem, from: Date, to: Date, topNum: number, histories = new Array<ConversationItem>(), cursor = ""): Promise<ConversationItem[]> {
+    public async getChannelTheMostConversationRecursive(channel: ConversationsListResultItem, from: Date, to: Date, topNum: number, dest: Array<ConversationItem>, cursor = ""): Promise<void> {
         await this.wait()
-
+        
         const result = await this.slackDriver.getConversationHistory({
             channel: channel.id,
             limit: 1000,
@@ -62,13 +62,19 @@ export default class SlackService {
         const reactedMessages = messgaes.filter(m => this.calcService.calcReactionsCount(m) > 0)
         const topMessages = this.calcService.extractTopItems(this.calcService.sortByReaction(reactedMessages), topNum)
 
-        histories.push(...(topMessages))
+        dest.push(...(topMessages))
+        dest = this.calcService.extractTopItems(this.calcService.sortByReaction(dest), topNum)
 
-        if (result.response_metadata && result.response_metadata.next_cursor) {
-            return await this.getChannelTheMostConversationRecursive(channel, from, to, topNum, histories, result.response_metadata.next_cursor)
+        console.log(dest.map(h => ({
+            c: this.calcService.calcReactionsCount(h), 
+            id: h.history.ts, 
+            ch:h.channel.id + ' ' + h.channel.name,
+        })))
+
+        if (result.response_metadata && result.response_metadata.next_cursor && result.response_metadata.next_cursor.length > 0) {
+            console.log(cursor, result.response_metadata.next_cursor, cursor === result.response_metadata.next_cursor)
+            return await this.getChannelTheMostConversationRecursive(channel, from, to, topNum, dest, result.response_metadata.next_cursor)
         }
-
-        return histories
     }
 
     public async getPermLinks(items: ConversationItem[]) {

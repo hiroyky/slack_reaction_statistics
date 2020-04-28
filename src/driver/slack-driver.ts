@@ -30,7 +30,7 @@ export default class SlackDriver {
 
     public async getConversationHistory(arg: ConversationsHistoryArguments) {
         try {
-            console.log(this.getTimeStamp(), "slackdriver getConversationHistory", arg.channel)
+            console.log(this.getTimeStamp(), "slackdriver getConversationHistory", arg.channel, arg.cursor)
             arg.token = this.token
             return  await this.client.conversations.history(arg)
         } catch(err) {
