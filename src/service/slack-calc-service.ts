@@ -17,15 +17,23 @@ export default class SlackCalcService {
                 })
     }
 
-    public filterAvailableHistories(items: ConversationsHistoryResultItem[]) {
+    public filterAvailableHistories(
+        items: ConversationsHistoryResultItem[],
+        excludeWords: string[]
+    ) {
         return items
                 .filter(i => !i.bot_id && i.user)
                 .filter(i => !i.subtype)
                 .filter(i => i.reactions)
+                .filter(i => {
+                    return excludeWords.every((e) => {
+                        const re = new RegExp(e);
+                        return !re.test(i.text || '')
+                    })
+                })
     }
 
-
-    public extractTopItems(sortedItems: ConversationItem[], num: number): ConversationItem[] {        
+    public extractTopItems(sortedItems: ConversationItem[], num: number): ConversationItem[] {
         const topItems = sortedItems.slice(0, num)
         if (topItems.length == 0 ) {
             return []
