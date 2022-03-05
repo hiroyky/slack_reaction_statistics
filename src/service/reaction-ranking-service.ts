@@ -5,7 +5,7 @@ import moment from 'moment-timezone'
 
 export default class ReactionRankingService {
     constructor(
-        private slackService: SlackService, 
+        private slackService: SlackService,
         private slackCalcService: SlackCalcService,
         ) {
     }
@@ -48,12 +48,14 @@ export default class ReactionRankingService {
         console.log(this.getTimeStamp(), `joined ${newCount} channels.`)
 
         console.log(this.getTimeStamp(), "gathering conversation items...")
-        const items = await this.slackService.getTheMostReactedConversations(targetChannels, from, to, env.numFeatures)
+        const items = await this.slackService.getTheMostReactedConversations(targetChannels, from, to, env.numFeatures, env.excludeWords)
+
         console.log(this.getTimeStamp(), `gatherd ${items.length} items`)
         const links = await this.slackService.getPermLinks(this.slackCalcService.extractTopItems(items, env.numFeatures))
+
         console.log(links)
         await this.slackService.postFeaturedPosts(env.postChannel, links, from, to)
-    }    
+    }
 
     private getTimeStamp(){
         return new Date().getTime() / 1000

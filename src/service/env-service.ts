@@ -49,6 +49,14 @@ export default class EnvService {
         return exclude.split(',').filter(i => i.length > 0)
     }
 
+    public get excludeWords(): string[] {
+        const exclude = process.env.EXCLUDE_WORDS
+        if (exclude === undefined) {
+            return []
+        }
+        return exclude.split(',').filter(i => i.length > 0)
+    }
+
     private parseInt(str: string | undefined) {
         if (str === undefined) {
             throw new Error()
